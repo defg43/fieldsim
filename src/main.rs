@@ -11,7 +11,7 @@ struct Point {
     y: f64,
 } */
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Copy)]
 enum Cell {
 	Air { potential: i32 }, 
 	Metal { voltage: i32, pin:Option<u16> }, 
@@ -29,7 +29,7 @@ enum ConductorShape {
 struct CellGrid {
 	grid: [[Cell; 100]; 100], 
 	conductor_count: i32,
-	conductors: Vec<ConductorShape>,  
+	// conductors: Vec<ConductorShape>,  
 }
 
 fn create_line(p1: Point<i32>, p2: Point<i32>) -> Option<Vec<Point<i32>>> {
@@ -41,9 +41,11 @@ fn create_line(p1: Point<i32>, p2: Point<i32>) -> Option<Vec<Point<i32>>> {
 }
 
 fn place_conductors_on_grid(conductor_to_place: Vec<ConductorShape>) -> Option<CellGrid> {
-	let mut grid : Option<CellGrid> = Default::default();
+	let mut grid : Option<CellGrid> = 
+		Some(CellGrid {grid: [[Cell::Air {potential: 0};100];100], conductor_count: 0});
 	let mut buffer: Option<Vec<Point<i32>>> = Default::default();
 	for conductor in conductor_to_place {
+		dbg!(&conductor);
 		match conductor {
 			ConductorShape::Line { p1, p2 } => buffer = create_line(p1, p2), 
 			ConductorShape::Circle { origin, radius } => todo!(), 
@@ -67,5 +69,21 @@ fn place_conductors_on_grid(conductor_to_place: Vec<ConductorShape>) -> Option<C
 }
 
 fn main() {
-    println!("Hello, world!");
+	let foo:ConductorShape = ConductorShape::Line { p1: (0,0), p2: (99,99) };
+	let gr:Option<CellGrid> = place_conductors_on_grid(vec![foo]);
+	
+	if let Some(cell_grid) = gr {
+        for (x, row) in cell_grid.grid.iter().enumerate() {
+            for (y, cell) in row.iter().enumerate() {
+				match cell {
+					Cell::Metal { .. } => 
+						println!("Cell ({}, {}) is a conductor: {:#?}", x, y, cell),
+					Cell::Air { .. } => {},
+				};
+            }
+        }
+    } else {
+        println!("Failed to create the cell grid.");
+    }
+	//dbg!(bar);
 }
