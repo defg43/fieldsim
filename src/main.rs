@@ -77,7 +77,7 @@ fn main() {
             for (y, cell) in row.iter().enumerate() {
 				match cell {
 					Cell::Metal { .. } => 
-						println!("Cell ({}, {}) is a conductor: {:#?}", x, y, cell),
+						println!("Cell ({}, {}) is a conductor: {:?}", x, y, cell),
 					Cell::Air { .. } => {},
 				};
             }
